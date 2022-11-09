@@ -1,28 +1,23 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.Create;
+import ru.practicum.shareit.Update;
 
-import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-/**
- * TODO Sprint add-controllers.
- */
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class ItemDto {
+public class UserDto {
     private long id;
     @NotBlank(groups = {Create.class})
     private String name;
-    @NotBlank(groups = {Create.class})
-    private String description;
+    @Email(groups = {Create.class, Update.class})
     @NotNull(groups = {Create.class})
-    @AssertTrue(groups = {Create.class})
-    private Boolean available;
+    private String email;
 }
