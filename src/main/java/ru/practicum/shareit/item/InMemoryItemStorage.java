@@ -27,7 +27,7 @@ public class InMemoryItemStorage implements ItemStorage {
         if (items.containsKey(itemId)) {
             return items.get(itemId);
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Вещь не найдена");
         }
     }
 
@@ -47,7 +47,7 @@ public class InMemoryItemStorage implements ItemStorage {
             items.put(itemId, item);
             return item;
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Вещь не найдена");
         }
     }
 

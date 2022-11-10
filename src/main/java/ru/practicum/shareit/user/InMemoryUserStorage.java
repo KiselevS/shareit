@@ -23,20 +23,19 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(UserDto userDto, long userId) {
-        if (users.containsKey(userId)) {
-            User user = users.get(userId);
-            if (userDto.getName() != null) {
-                user.setName(userDto.getName());
-            }
-            if (userDto.getEmail() != null) {
-                checkEmail(userDto.getEmail());
-                user.setEmail(userDto.getEmail());
-            }
-            users.put(userId, user);
-            return user;
-        } else {
-            throw new NotFoundException();
+        if (!users.containsKey(userId)) {
+            throw new NotFoundException("Пользователь не найден");
         }
+        User user = users.get(userId);
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            checkEmail(userDto.getEmail());
+            user.setEmail(userDto.getEmail());
+        }
+        users.put(userId, user);
+        return user;
     }
 
     @Override
@@ -58,14 +57,14 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(userId)) {
             users.remove(userId);
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Пользователь не найден");
         }
     }
 
     private void checkEmail(String email) {
         for (User user : users.values()) {
             if (user.getEmail().equals(email)) {
-                throw new EmailAlreadyExistsException();
+                throw new EmailAlreadyExistsException("Пользователь с таким email уже существует");
             }
         }
     }

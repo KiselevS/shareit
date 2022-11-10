@@ -10,63 +10,55 @@ import ru.practicum.shareit.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
-    private final ItemMapper itemMapper;
 
     @Autowired
-    public ItemServiceImpl(ItemStorage itemStorage, UserStorage userStorage, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemStorage itemStorage, UserStorage userStorage) {
         this.itemStorage = itemStorage;
         this.userStorage = userStorage;
-        this.itemMapper = itemMapper;
     }
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long ownerId) {
         if (userStorage.getUserById(ownerId).isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Вещь не найдена");
         }
-        Item item = itemMapper.toItem(itemDto, ownerId);
+        Item item = ItemMapper.toItem(itemDto, ownerId);
         Item addedItem = itemStorage.addItem(item);
-        return itemMapper.toItemDto(addedItem);
+        return ItemMapper.toItemDto(addedItem);
     }
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, long itemId, long ownerId) {
         if (itemStorage.getItemById(itemId).getOwner() != ownerId) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException("Только владелец может обновить информацию о вещи");
         }
         Item updatedItem = itemStorage.updateItem(itemDto, itemId);
-        return itemMapper.toItemDto(updatedItem);
+        return ItemMapper.toItemDto(updatedItem);
     }
 
     @Override
     public ItemDto getItemById(long itemId) {
-        return itemMapper.toItemDto(itemStorage.getItemById(itemId));
+        return ItemMapper.toItemDto(itemStorage.getItemById(itemId));
     }
 
     @Override
     public Collection<ItemDto> getItemsByOwnerId(long ownerId) {
-        Collection<ItemDto> items = new ArrayList<>();
-        for (Item item : itemStorage.getItemsByOwnerId(ownerId)) {
-            items.add(itemMapper.toItemDto(item));
-        }
-        return items;
+        return itemStorage.getItemsByOwnerId(ownerId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
     public Collection<ItemDto> searchItem(String text) {
-        Collection<ItemDto> searchedItems = new ArrayList<>();
         if (text.isBlank()) {
-            return searchedItems;
+            return new ArrayList<>();
         }
-        for (Item item : itemStorage.searchItem(text)) {
-            searchedItems.add(itemMapper.toItemDto(item));
-        }
-        return searchedItems;
+
+        return itemStorage.searchItem(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 }
