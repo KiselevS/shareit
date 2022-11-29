@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class ErrorMessage {
-    private final String message;
+    private final String error;
 }
