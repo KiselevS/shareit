@@ -11,6 +11,7 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBooker_IdOrderByEndDesc(Long bookerId);
+
     @Query("select b from Booking b " +
             "where b.booker.id = :bookerId " +
             "and b.start <= :currentDate " +
