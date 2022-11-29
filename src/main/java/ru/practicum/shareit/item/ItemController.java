@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Create;
+import ru.practicum.shareit.item.dto.CommentInDto;
+import ru.practicum.shareit.item.dto.CommentOutDto;
+import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
@@ -28,14 +31,22 @@ public class ItemController {
         return itemService.updateItem(itemDto, itemId, ownerId);
     }
 
+    @PostMapping("/{itemId}/comment")
+    public CommentOutDto addComment(@RequestHeader("X-Sharer-User-id") long userId,
+                                    @PathVariable long itemId,
+                                    @Validated @RequestBody CommentInDto commentInDto) {
+        return itemService.addComment(userId, itemId, commentInDto);
+    }
+
     @GetMapping
-    public Collection<ItemDto> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public Collection<ItemBookingDto> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
         return itemService.getItemsByOwnerId(ownerId);
     }
 
     @GetMapping(path = "/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemBookingDto getItemById(@RequestHeader("X-Sharer-User-id") long userId,
+                                      @PathVariable long itemId) {
+        return itemService.getById(userId, itemId);
     }
 
     @GetMapping(path = "/search")
