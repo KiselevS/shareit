@@ -14,9 +14,9 @@ public class ItemBookingDto {
     private String name;
     private String description;
     private Boolean available;
-    Booking lastBooking;
-    Booking nextBooking;
-    List<Comment> comments;
+    private Booking lastBooking;
+    private Booking nextBooking;
+    private List<Comment> comments;
 
     public ItemBookingDto(long id, String name, String description, boolean available, Booking lastBooking, Booking nextBooking) {
         this.id = id;
@@ -31,16 +31,16 @@ public class ItemBookingDto {
     @Data
     @AllArgsConstructor
     public static class Booking {
-        Long id;
-        Long bookerId;
+        private Long id;
+        private Long bookerId;
     }
 
     @Data
     @AllArgsConstructor
     public static class Comment {
-        Long id;
-        String text;
-        String authorName;
-        LocalDateTime created;
+        private Long id;
+        private String text;
+        private String authorName;
+        private LocalDateTime created;
     }
 }

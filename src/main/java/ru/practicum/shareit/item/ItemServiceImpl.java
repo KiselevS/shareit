@@ -58,11 +58,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(ItemDto itemDto, long itemId, long ownerId) {
 
-        Optional<Item> itemOptional = itemRepository.findById(itemId);
-        if (itemOptional.isEmpty()) {
-            throw new NotFoundException("Вещь не найдена");
-        }
-        Item item = itemOptional.get();
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (item.getOwner() != ownerId) {
             throw new AccessDeniedException("Только владелец может обновить информацию о вещи");
@@ -83,11 +79,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemBookingDto getById(Long userId, Long itemId) {
-        Optional<Item> optionalItem = itemRepository.findById(itemId);
-        if (optionalItem.isEmpty()) {
-            throw new NotFoundException("Вещь не найдена");
-        }
-        Item item = optionalItem.get();
+
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
@@ -175,17 +168,8 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
 
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new NotFoundException("Пользователь не найден");
-        }
-        User user = userOptional.get();
-
-        Optional<Item> itemOptional = itemRepository.findById(itemId);
-        if (itemOptional.isEmpty()) {
-            throw new NotFoundException("Вещь не найдена");
-        }
-        Item item = itemOptional.get();
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (bookingRepository.findByBooker_Id(userId).stream()
                 .anyMatch(booking -> booking.getItem().getId() == item.getId()

@@ -25,7 +25,7 @@ public class BookingOutDto {
 
     @Data
     public static class Booker {
-        Long id;
+        private Long id;
 
         public Booker(long id) {
             this.id = id;
@@ -34,8 +34,8 @@ public class BookingOutDto {
 
     @Data
     public static class Item {
-        Long id;
-        String name;
+        private Long id;
+        private String name;
 
         public Item(long id, String name) {
             this.id = id;

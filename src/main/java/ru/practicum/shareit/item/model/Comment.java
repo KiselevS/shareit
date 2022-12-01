@@ -1,6 +1,10 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -25,6 +29,7 @@ public class Comment {
     @Column(name = "author_id")
     private long authorId;
 
+    @Length(max = 32)
     @Column(name = "author_name")
     private String authorName;
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,8 +20,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
     private long id;
-    @Column(name = "name")
+
+    @Length(max = 32)
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "email", unique = true)
+
+    @Length(max = 32)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 }

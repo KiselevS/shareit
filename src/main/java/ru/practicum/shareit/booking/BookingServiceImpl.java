@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class BookingServiceImpl implements BookingService {
-    final BookingRepository bookingRepository;
-    final UserRepository userRepository;
-    final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Autowired
     public BookingServiceImpl(BookingRepository bookingRepository, UserRepository userRepository,
@@ -40,23 +40,15 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
 
-        Optional<Item> optionalItem = itemRepository.findById(bookingInDto.getItemId());
-        if (optionalItem.isEmpty()) {
-            throw new NotFoundException("Вещь не найдена");
-        }
-
-        Item item = optionalItem.get();
+        Item item = itemRepository.findById(bookingInDto.getItemId()).orElseThrow(
+                () -> new NotFoundException("Вещь не найдена"));
 
         if (item.getOwner() == bookerId) {
             throw new NotFoundException("Владелец не может бронировать собственные вещи");
         }
 
-        Optional<User> optionalBooker = userRepository.findById(bookerId);
-        if (optionalBooker.isEmpty()) {
-            throw new NotFoundException("Пользователь не найден");
-        }
-
-        User booker = optionalBooker.get();
+        User booker = userRepository.findById(bookerId).orElseThrow(
+                () -> new NotFoundException("Пользователь не найден"));
 
         if (!item.isAvailable()) {
             throw new BadRequestException("Вещь недоступна для бронирования");
@@ -78,12 +70,8 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
 
-        Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-        if (optionalBooking.isEmpty()) {
-            throw new NotFoundException("Вещь не найдена");
-        }
-
-        Booking booking = optionalBooking.get();
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new NotFoundException("Бронирование не найдено"));
 
         if (booking.getStatus() == Status.APPROVED) {
             throw new BadRequestException("Невозможно изменить статус");
@@ -110,11 +98,8 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
 
-        Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-        if (optionalBooking.isEmpty()) {
-            throw new NotFoundException("Бронирование не найдено");
-        }
-        Booking booking = optionalBooking.get();
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new NotFoundException("Бронирование не найдено"));
 
         if (booking.getItem().getOwner() != userId
                 && booking.getBooker().getId() != userId) {
