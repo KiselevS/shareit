@@ -63,6 +63,24 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUserEmptyName() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.save(any())).thenReturn(new User(2, "updatedName", "up@mail.ru"));
+        UserDto dto = UserDto.builder().email("up@mail.ru").build();
+        UserDto userOutDto = userService.updateUser(dto, 2L);
+        assertEquals(dto.getEmail(), userOutDto.getEmail());
+    }
+
+    @Test
+    void updateUserEmptyEmail() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.save(any())).thenReturn(new User(2, "up", "updated@mail.ru"));
+        UserDto dto = UserDto.builder().name("up").build();
+        UserDto userOutDto = userService.updateUser(dto, 2L);
+        assertEquals(dto.getName(), userOutDto.getName());
+    }
+
+    @Test
     void getUsers() {
         List<User> users = new ArrayList<>() {{
             add(user1);

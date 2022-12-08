@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.Create;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 public class UserDto {
     private long id;
     @NotBlank(groups = {Create.class})

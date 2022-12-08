@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingInDto;
 import ru.practicum.shareit.booking.dto.BookingOutDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.WrongStateException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -88,6 +92,9 @@ class BookingServiceTest {
         assertEquals(booking.getItem().getId(), testBooking.getItem().getId());
         assertEquals(booking.getStart(), testBooking.getStart());
         assertEquals(booking.getEnd(), testBooking.getEnd());
+        assertThrows(BadRequestException.class, () -> bookingService.addBooking(bookingInDto, null));
+        assertThrows(NotFoundException.class, () -> bookingService.addBooking(bookingInDto, 1L));
+        assertThrows(NotFoundException.class, () -> bookingService.addBooking(bookingInDto, 3L));
     }
 
     @Test
@@ -109,6 +116,9 @@ class BookingServiceTest {
 
         assertEquals(1L, testBooking.getId());
         assertEquals(approvedBooking.getStatus(), testBooking.getStatus());
+        assertThrows(BadRequestException.class, () -> bookingService.setApprove(1L, null, true));
+        assertThrows(NotFoundException.class, () -> bookingService.setApprove(999L, 1L, true));
+        assertThrows(NotFoundException.class, () -> bookingService.setApprove(999L, 2L, true));
     }
 
     @Test
@@ -122,6 +132,10 @@ class BookingServiceTest {
         assertEquals(booking.getItem().getId(), testBooking.getItem().getId());
         assertEquals(booking.getStart(), testBooking.getStart());
         assertEquals(booking.getEnd(), testBooking.getEnd());
+
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(1L, 999L));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(999L, 1L));
+        assertThrows(BadRequestException.class, () -> bookingService.getBookingById(1L, null));
     }
 
     @Test
@@ -133,6 +147,16 @@ class BookingServiceTest {
 
         assertEquals(1, testBookings.size());
         assertEquals(1L, testBookings.get(0).getId());
+        assertThrows(WrongStateException.class,
+                () -> bookingService.getBookingsByState(1L, "Unknown state", Pageable.unpaged()));
+        assertEquals(0, bookingService.getBookingsByState(1L, "CURRENT", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByState(1L, "PAST", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByState(1L, "REJECTED", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByState(1L, "FUTURE", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByState(1L, "WAITING", Pageable.unpaged()).size());
+        assertThrows(BadRequestException.class, () -> bookingService.getBookingsByState(null, "ALL", Pageable.unpaged()));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingsByState(999L, "ALL", Pageable.unpaged()));
+
     }
 
     @Test
@@ -144,5 +168,14 @@ class BookingServiceTest {
 
         assertEquals(1, testBookings.size());
         assertEquals(1L, testBookings.get(0).getId());
+        assertThrows(WrongStateException.class,
+                () -> bookingService.getBookingsByOwner(2L, "Unknown state", Pageable.unpaged()));
+        assertEquals(0, bookingService.getBookingsByOwner(2L, "CURRENT", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByOwner(2L, "PAST", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByOwner(2L, "REJECTED", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByOwner(2L, "FUTURE", Pageable.unpaged()).size());
+        assertEquals(0, bookingService.getBookingsByOwner(2L, "WAITING", Pageable.unpaged()).size());
+        assertThrows(BadRequestException.class, () -> bookingService.getBookingsByOwner(null, "ALL", Pageable.unpaged()));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingsByOwner(999L, "ALL", Pageable.unpaged()));
     }
 }
