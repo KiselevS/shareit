@@ -1,18 +1,21 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingInDto;
 import ru.practicum.shareit.booking.dto.BookingOutDto;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-
+@Validated
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
-    final BookingService bookingService;
+    private final BookingService bookingService;
 
     @Autowired
     public BookingController(BookingService bookingService) {
@@ -27,9 +30,13 @@ public class BookingController {
 
     @GetMapping
     public List<BookingOutDto> getBookingsByState(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                  @RequestParam(defaultValue = "0")
+                                                  @PositiveOrZero int from,
+                                                  @RequestParam(defaultValue = "10") @Positive int size,
                                                   @RequestParam(required = false, defaultValue = "ALL")
                                                   String state) {
-        return bookingService.getBookingsByState(userId, state);
+        int page = from / size;
+        return bookingService.getBookingsByState(userId, state, PageRequest.of(page, size));
     }
 
     @GetMapping("/{bookingId}")
@@ -40,9 +47,13 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingOutDto> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId,
+                                                  @RequestParam(defaultValue = "0")
+                                                  @PositiveOrZero int from,
+                                                  @RequestParam(defaultValue = "10") @Positive int size,
                                                   @RequestParam(required = false, defaultValue = "ALL")
                                                   String state) {
-        return bookingService.getBookingsByOwner(ownerId, state);
+        int page = from / size;
+        return bookingService.getBookingsByOwner(ownerId, state, PageRequest.of(page, size));
     }
 
     @PatchMapping("/{bookingId}")

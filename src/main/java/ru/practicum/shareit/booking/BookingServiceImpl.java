@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingInDto;
 import ru.practicum.shareit.booking.dto.BookingOutDto;
@@ -110,7 +111,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingOutDto> getBookingsByState(Long userId, String state) {
+    public List<BookingOutDto> getBookingsByState(Long userId, String state, Pageable pageable) {
         if (userId == null) {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
@@ -127,22 +128,22 @@ public class BookingServiceImpl implements BookingService {
 
         switch (State.valueOf(state)) {
             case ALL:
-                bookings = bookingRepository.findByBooker_IdOrderByEndDesc(userId);
+                bookings = bookingRepository.findByBooker_IdOrderByEndDesc(userId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBookerCurrentBookings(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerCurrentBookings(userId, LocalDateTime.now(), pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findByBookerPastBookings(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerPastBookings(userId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBookerFutureBookings(userId, LocalDateTime.now());
+                bookings = bookingRepository.findByBookerFutureBookings(userId, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBooker_IdAndStatusOrderByEndDesc(userId, Status.WAITING);
+                bookings = bookingRepository.findByBooker_IdAndStatusOrderByEndDesc(userId, Status.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByBooker_IdAndStatusOrderByEndDesc(userId, Status.REJECTED);
+                bookings = bookingRepository.findByBooker_IdAndStatusOrderByEndDesc(userId, Status.REJECTED, pageable);
                 break;
         }
 
@@ -152,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingOutDto> getBookingsByOwner(Long ownerId, String state) {
+    public List<BookingOutDto> getBookingsByOwner(Long ownerId, String state, Pageable pageable) {
         if (ownerId == null) {
             throw new BadRequestException("Заголовок X-Sharer-User-Id не найден");
         }
@@ -170,22 +171,22 @@ public class BookingServiceImpl implements BookingService {
 
         switch (State.valueOf(state)) {
             case ALL:
-                bookings = bookingRepository.findByItem_OwnerOrderByEndDesc(ownerId);
+                bookings = bookingRepository.findByItem_OwnerOrderByEndDesc(ownerId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByOwnerIdCurrentBookings(ownerId, LocalDateTime.now());
+                bookings = bookingRepository.findByOwnerIdCurrentBookings(ownerId, LocalDateTime.now(), pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findByOwnerIdPastBookings(ownerId, LocalDateTime.now());
+                bookings = bookingRepository.findByOwnerIdPastBookings(ownerId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByOwnerIdFutureBookings(ownerId, LocalDateTime.now());
+                bookings = bookingRepository.findByOwnerIdFutureBookings(ownerId, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByItem_OwnerAndStatusOrderByEndDesc(ownerId, Status.WAITING);
+                bookings = bookingRepository.findByItem_OwnerAndStatusOrderByEndDesc(ownerId, Status.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByItem_OwnerAndStatusOrderByEndDesc(ownerId, Status.REJECTED);
+                bookings = bookingRepository.findByItem_OwnerAndStatusOrderByEndDesc(ownerId, Status.REJECTED, pageable);
                 break;
             default:
                 throw new WrongStateException("Unknown state: " + state);

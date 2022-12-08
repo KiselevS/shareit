@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS requests
     id           BIGINT GENERATED ALWAYS AS IDENTITY,
     description  VARCHAR(1024),
     requestor_id BIGINT,
+    created     TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_request PRIMARY KEY (id),
     CONSTRAINT fk_request_user FOREIGN KEY (requestor_id) references users (id)
 );
