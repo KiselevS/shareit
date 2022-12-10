@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -30,14 +31,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
-                           BookingRepository bookingRepository, CommentRepository commentRepository) {
+                           BookingRepository bookingRepository, CommentRepository commentRepository,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Transactional
@@ -47,6 +51,10 @@ public class ItemServiceImpl implements ItemService {
 
         if (owner.isPresent()) {
             Item item = ItemMapper.toItem(itemDto, owner.get().getId());
+            if (itemDto.getRequestId() != null) {
+                item.setRequest(itemRequestRepository
+                        .findById(itemDto.getRequestId()).orElse(null));
+            }
             Item addedItem = itemRepository.save(item);
             return ItemMapper.toItemDto(addedItem);
         }
@@ -73,6 +81,11 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
+        if (itemDto.getRequestId() != null) {
+            long requestId = itemDto.getRequestId();
+            item.setRequest(itemRequestRepository.findById(requestId).get());
+        }
+
         Item updatedItem = itemRepository.save(item);
         return ItemMapper.toItemDto(updatedItem);
     }
