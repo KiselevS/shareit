@@ -8,6 +8,7 @@ import ru.practicum.shareit.Create;
 import ru.practicum.shareit.item.dto.CommentInDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -36,9 +37,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-id") long userId,
-                                             @PathVariable long itemId,
-                                             @Validated @RequestBody CommentInDto commentInDto) {
+    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-id") Long userId,
+                                             @PathVariable Long itemId,
+                                             @Valid @RequestBody CommentInDto commentInDto) {
         return itemClient.addComment(userId, itemId, commentInDto);
     }
 
