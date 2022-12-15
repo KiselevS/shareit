@@ -16,12 +16,16 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class ItemDto {
     private long id;
+
     @NotBlank(groups = {Create.class})
     private String name;
+
     @NotBlank(groups = {Create.class})
     private String description;
+
     @NotNull(groups = {Create.class})
     @AssertTrue(groups = {Create.class})
     private Boolean available;
+
     private Long requestId;
 }
